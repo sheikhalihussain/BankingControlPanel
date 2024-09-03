@@ -23,14 +23,14 @@ namespace BankingControlPanel.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //var result = await _signInManager.PasswordSignInAsync(user.Email, user.Password, false, false);
+            var result = await _userManager.PasswordSignInAsync(user.Email, user.Password, false, false);
 
-            //if (result.Succeeded)
-            //{
-                //var IsUser = await _userManager.FindByEmailAsync(user.Email);
+            if (result.Succeeded)
+            {
+                var IsUser = await _userManager.FindByEmailAsync(user.Email);
                 var token = _jwtManager.GenerateToken(user.Email);
                 return Ok(new { token });
-            //}
+            }
 
             return Unauthorized();
         }
