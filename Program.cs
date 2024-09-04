@@ -20,6 +20,7 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddBusinessLayer();
 builder.Services.AddDataInfrastructure(builder.Configuration);
+builder.WebHost.UseUrls("http://localhost:5001");
 //.AddJwtBearer(options =>
 //{
 //    options.TokenValidationParameters = new TokenValidationParameters
