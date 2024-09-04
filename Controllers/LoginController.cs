@@ -17,6 +17,7 @@ namespace BankingControlPanel.API.Controllers
             _jwtManager = jwtManager;
             _userManager = userManager;
         }
+        #region Authorization
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto model)
         {
@@ -55,6 +56,6 @@ namespace BankingControlPanel.API.Controllers
 
             return Unauthorized();
         }
-
+        #endregion
     }
 }
