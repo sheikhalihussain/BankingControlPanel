@@ -1,4 +1,5 @@
 ﻿using BankingControlPanel.API.Services.JWT;
+using BCP.Manager.User;
 using BCP.Model.Login;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,25 +11,45 @@ namespace BankingControlPanel.API.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IJwtManager _jwtManager;
-        public LoginController(UserManager<IdentityUser> userManager,
-                            SignInManager<IdentityUser> signInManager,
-                            IConfiguration configuration, IJwtManager jwtManager
-         )
+        private readonly UserManager _userManager;
+        public LoginController(UserManager userManager,SignInManager<IdentityUser> signInManager,IConfiguration configuration, IJwtManager jwtManager)
         {
             _jwtManager = jwtManager;
+            _userManager = userManager;
         }
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto user)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(RegisterDto model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _userManager.PasswordSignInAsync(user.Email, user.Password, false, false);
-
-            if (result.Succeeded)
             {
-                var IsUser = await _userManager.FindByEmailAsync(user.Email);
-                var token = _jwtManager.GenerateToken(user.Email);
+                return BadRequest(ModelState);
+            }
+            var result = await _userManager.CreateUser(model); // Adding User
+          
+            if (result.IsSuccess)
+            {
+                return Ok();
+            }
+
+            foreach (var error in result.Errors) // Handling Errors
+            {
+                ModelState.AddModelError("", error);
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _userManager.SignInAsync(model); // Cheking Authorized User
+
+            if (result.IsSuccess)
+            {
+                var claim = _jwtManager.GenerateClaim(model.Email); // Generating Email Claims
+                var token = _jwtManager.GenerateToken(claim); // Generation JSON Token
                 return Ok(new { token });
             }
 

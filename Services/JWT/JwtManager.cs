@@ -5,13 +5,13 @@ using System.Text;
 
 namespace BankingControlPanel.API.Services.JWT
 {
-    public class JwtManager :IJwtManager
+    public class JwtManager : IJwtManager
     {
         private readonly string _secret;
         private readonly double _expireMinutes;
         public JwtManager(IConfiguration config)
         {
-            _secret = config["JwtConfig:Key"];            
+            _secret = config["JwtConfig:Key"];
             _expireMinutes = double.Parse(config["JwtConfig:ExpireMinutes"]);
         }
         public string GenerateToken(IEnumerable<Claim> claims)
@@ -27,5 +27,15 @@ namespace BankingControlPanel.API.Services.JWT
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public IEnumerable<Claim> GenerateClaim(string email)
+        {
+            var claims = new[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, email),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Email, email)
+            };
+            return claims; 
+        }
     }
 }

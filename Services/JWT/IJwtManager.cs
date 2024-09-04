@@ -4,6 +4,7 @@ namespace BankingControlPanel.API.Services.JWT
 {
     public interface IJwtManager
     {
-        public string GenerateToken(     claims);
+        string GenerateToken(IEnumerable<Claim> claims);
+        IEnumerable<Claim> GenerateClaim(string email);
     }
 }
