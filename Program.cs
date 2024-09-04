@@ -1,4 +1,6 @@
 using BankingControlPanel.API.Services.JWT;
+using BCP.Data;
+using BCP.Manager;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,8 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
+builder.Services.AddBusinessLayer();
+builder.Services.AddDataInfrastructure(builder.Configuration);
 //.AddJwtBearer(options =>
 //{
 //    options.TokenValidationParameters = new TokenValidationParameters
@@ -37,11 +41,15 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Banking Control Panel API v1");
+        c.RoutePrefix = string.Empty;  // Swagger UI at the root
+    });
 }
 
-app.UseHttpsRedirection();
-
+//app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

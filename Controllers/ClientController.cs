@@ -1,5 +1,6 @@
 ﻿using BCP.Data.Models;
 using BCP.Manager.Client;
+using BCP.Manager.Utilities;
 using BCP.Model.Client;
 using Microsoft.AspNetCore.Mvc;
 
@@ -60,6 +61,15 @@ namespace BankingControlPanel.API.Controllers
         {
             var result = await _clientManager.DeleteClient(id);
             return Ok(result);
+        }
+        #endregion
+
+        #region Cache
+        [HttpGet("search-history")]
+        public async Task<IActionResult> GetSearchHistory()
+        {
+            var lastSearchParameters = _clientManager.GetLastSearchParameters();
+            return Ok(lastSearchParameters);
         }
         #endregion
     }
